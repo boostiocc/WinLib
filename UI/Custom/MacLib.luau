@@ -385,6 +385,48 @@ function MacLib:Window(Settings)
 	titleFrame.BorderSizePixel = 0
 	titleFrame.Size = UDim2.fromScale(1, 1)
 
+	local titleFrameUIListLayout = Instance.new("UIListLayout")
+	titleFrameUIListLayout.Name = "TitleFrameUIListLayout"
+	titleFrameUIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	titleFrameUIListLayout.Padding = UDim.new(0, 10)
+	titleFrameUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	titleFrameUIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	titleFrameUIListLayout.Parent = titleFrame
+
+	-- Optional icon / logo on the left of the title
+	local iconImage
+	if Settings.Icon then
+		iconImage = Instance.new("ImageLabel")
+		iconImage.Name = "Icon"
+		iconImage.Image = Settings.Icon
+		iconImage.BackgroundTransparency = 1
+		iconImage.BorderSizePixel = 0
+		iconImage.Size = UDim2.fromOffset(28, 28)
+		iconImage.LayoutOrder = 0
+		iconImage.ScaleType = Enum.ScaleType.Fit
+		iconImage.Parent = titleFrame
+
+		local iconUICorner = Instance.new("UICorner")
+		iconUICorner.Name = "IconUICorner"
+		iconUICorner.CornerRadius = UDim.new(0, 6)
+		iconUICorner.Parent = iconImage
+	end
+
+	local textContainer = Instance.new("Frame")
+	textContainer.Name = "TextContainer"
+	textContainer.BackgroundTransparency = 1
+	textContainer.BorderSizePixel = 0
+	textContainer.Size = UDim2.new(1, Settings.Icon and -38 or 0, 1, 0) -- 28px icon + 10px padding
+	textContainer.LayoutOrder = 1
+	textContainer.Parent = titleFrame
+
+	local textContainerUIListLayout = Instance.new("UIListLayout")
+	textContainerUIListLayout.Name = "TextContainerUIListLayout"
+	textContainerUIListLayout.Padding = UDim.new(0, 3)
+	textContainerUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	textContainerUIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	textContainerUIListLayout.Parent = textContainer
+
 	local title = Instance.new("TextLabel")
 	title.Name = "Title"
 	title.FontFace = Font.new(
@@ -406,7 +448,7 @@ function MacLib:Window(Settings)
 	title.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	title.BorderSizePixel = 0
 	title.Size = UDim2.new(1, -20, 0, 0)
-	title.Parent = titleFrame
+	title.Parent = textContainer
 
 	local subtitle = Instance.new("TextLabel")
 	subtitle.Name = "Subtitle"
@@ -431,14 +473,7 @@ function MacLib:Window(Settings)
 	subtitle.BorderSizePixel = 0
 	subtitle.LayoutOrder = 1
 	subtitle.Size = UDim2.new(1, -20, 0, 0)
-	subtitle.Parent = titleFrame
-
-	local titleFrameUIListLayout = Instance.new("UIListLayout")
-	titleFrameUIListLayout.Name = "TitleFrameUIListLayout"
-	titleFrameUIListLayout.Padding = UDim.new(0, 3)
-	titleFrameUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	titleFrameUIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-	titleFrameUIListLayout.Parent = titleFrame
+	subtitle.Parent = textContainer
 
 	titleFrame.Parent = informationHolder
 
@@ -931,6 +966,37 @@ function MacLib:Window(Settings)
 
 	function WindowFunctions:UpdateSubtitle(NewSubtitle)
 		subtitle.Text = NewSubtitle
+	end
+
+	function WindowFunctions:UpdateIcon(NewIcon)
+		if iconImage then
+			if NewIcon then
+				iconImage.Image = NewIcon
+				iconImage.Visible = true
+				textContainer.Size = UDim2.new(1, -38, 1, 0)
+			else
+				iconImage.Visible = false
+				textContainer.Size = UDim2.new(1, 0, 1, 0)
+			end
+		elseif NewIcon then
+			-- create on the fly if it wasn't there at window creation
+			iconImage = Instance.new("ImageLabel")
+			iconImage.Name = "Icon"
+			iconImage.Image = NewIcon
+			iconImage.BackgroundTransparency = 1
+			iconImage.BorderSizePixel = 0
+			iconImage.Size = UDim2.fromOffset(28, 28)
+			iconImage.LayoutOrder = 0
+			iconImage.ScaleType = Enum.ScaleType.Fit
+			iconImage.Parent = titleFrame
+
+			local iconUICorner = Instance.new("UICorner")
+			iconUICorner.Name = "IconUICorner"
+			iconUICorner.CornerRadius = UDim.new(0, 6)
+			iconUICorner.Parent = iconImage
+
+			textContainer.Size = UDim2.new(1, -38, 1, 0)
+		end
 	end
 
 	local hovering
@@ -5618,6 +5684,7 @@ function MacLib:Demo()
 	local Window = MacLib:Window({
 		Title = "Maclib Demo",
 		Subtitle = "This is a subtitle.",
+		Icon = "rbxassetid://18821914323", -- Optional: asset icon shown left of the title
 		Size = UDim2.fromOffset(868, 650),
 		DragStyle = 1,
 		DisabledWindowControls = {},
