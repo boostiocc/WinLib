@@ -29,7 +29,7 @@ blur.Size = 0
 blur.Parent = workspace.CurrentCamera
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "CFXSplash"
+gui.Name = SeedVersion
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
